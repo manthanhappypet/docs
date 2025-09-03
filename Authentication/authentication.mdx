@@ -1,0 +1,131 @@
+---
+title: "Authentication Module"
+description: "Complete authentication system documentation with flow diagrams, API details, performance metrics."
+---
+
+# Authentication Module
+
+The Happy Pet Authentication Module is a comprehensive, secure authentication system built on Firebase Authentication with custom JWT token management. This documentation provides complete implementation details, performance metrics for understanding the authentication flow.
+
+## 🔄 Complete Authentication Flow
+
+### 1. OTP-Based Authentication Flow
+
+<Steps>
+  <Step title="Phone Number Input">
+    Phone number format validation - Country code validation - Rate limiting check
+  </Step>
+  <Step title="OTP Request">
+    Send OTP API call - SMS service integration - OTP generation and storage
+  </Step>
+  <Step title="OTP Delivery">
+    SMS delivery via provider - Delivery confirmation - OTP expiry timer
+  </Step>
+  <Step title="OTP Verification">
+    OTP validation - User lookup/creation - Phone number verification
+  </Step>
+  <Step title="Authentication Complete">
+    JWT token generation - User session creation - Response with user data
+  </Step>
+</Steps>
+
+## 🔧 Dependencies & Versions
+
+### Core Dependencies
+
+<AccordionGroup>
+  <Accordion title="OTP & SMS Dependencies">
+    ```json
+    {
+      "twilio": "^4.19.0",
+      "aws-sdk": "^2.1500.0",
+      "node-cache": "^5.1.2",
+      "speakeasy": "^2.0.0"
+    }
+    ```
+
+    **Purpose**: SMS delivery, OTP generation, caching, TOTP support
+    **Last Updated**: 2024-01-10
+    **Security Status**: ✅ Up to date
+  </Accordion>
+  <Accordion title="JWT & Security">
+    ```json
+    {
+      "jsonwebtoken": "^9.0.2",
+      "bcryptjs": "^2.4.3",
+      "express-rate-limit": "^7.1.5",
+      "helmet": "^7.1.0"
+    }
+    ```
+
+    **Purpose**: Token management, security middleware, rate limiting
+    **Last Updated**: 2024-01-08
+    **Security Status**: ✅ Up to date
+  </Accordion>
+  <Accordion title="Validation & Utilities">
+    ```json
+    {
+      "joi": "^17.11.0",
+      "validator": "^13.11.0",
+      "libphonenumber-js": "^1.10.44",
+      "uuid": "^9.0.1"
+    }
+    ```
+
+    **Purpose**: Input validation, phone number validation, unique identifiers
+    **Last Updated**: 2024-01-05
+    **Security Status**: ✅ Up to date
+  </Accordion>
+  <Accordion title="Database & Caching">
+    ```json
+    {
+      "redis": "^4.6.10",
+      "mongoose": "^8.0.3",
+      "ioredis": "^5.3.2"
+    }
+    ```
+
+    **Purpose**: OTP storage, session management, user data persistence
+    **Last Updated**: 2024-01-12
+    **Security Status**: ✅ Up to date
+  </Accordion>
+  <Accordion title="Testing Dependencies">
+    ```json
+    {
+      "jest": "^29.7.0",
+      "supertest": "^6.3.3",
+      "@testing-library/react": "^14.1.2",
+      "msw": "^2.0.8"
+    }
+    ```
+
+    **Purpose**: Unit testing, integration testing, API mocking
+    **Last Updated**: 2024-01-12
+    **Security Status**: ✅ Up to date
+  </Accordion>
+</AccordionGroup>
+
+## 📡 API Endpoints Documentation
+
+### Authentication Endpoints
+
+<AccordionGroup>
+  <Accordion title="POST /auth/send-otp">
+    **Endpoint**: `POST /api/auth/send-otp`\
+    **Purpose**: Send OTP to phone number for authentication\
+    **Loading Time**: 50-60ms (avg: 55ms)\
+    **Last Tested**: 02-09-2025
+  </Accordion>
+  <Accordion title="POST /auth/login-signup">
+    **Endpoint**: `POST /api/auth/login-signup`\
+    **Purpose**: Combined login and signup endpoint with OTP verification\
+    **Loading Time**: 90-110ms (avg: 100ms)\
+    **Last Tested**: 02-09-2025
+  </Accordion>
+  <Accordion title="GET /auth/verify-token">
+    **Endpoint**: `GET /auth/verify-token`\
+    **Purpose**: Verify JWT token validity and return user information\
+    **Loading Time**: 110-250ms (avg: 180ms)\
+    **Last Tested**: 02-09-2025
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,117 @@
+---
+title: "Main Landing Page Module"
+description: "Complete main landing page documentation with component details, performance metrics, and user experience flow."
+---
+
+# Main Landing Page Module
+
+The Happy Pet Main Landing Page is a comprehensive, user-centric homepage that serves as the primary entry point for the pet ecosystem platform. This documentation provides complete implementation details.
+
+## 🔧 Dependencies & Versions
+
+### Core Dependencies
+
+<AccordionGroup>
+  <Accordion title="React & Next.js Framework">
+    ```json
+    {
+      "react": "18.2.0",
+      "react-dom": "18.2.0",
+      "next": "13.4.12"
+    }
+    ```
+
+    **Purpose**: Core framework, SSR, routing, and component management
+    **Last Updated**: 2024-01-10
+    **Security Status**: ✅ Up to date
+  </Accordion>
+  <Accordion title="UI & Styling">
+    ```json
+    {
+      "tailwindcss": "3.3.3",
+      "@material-tailwind/react": "^2.1.10",
+      "framer-motion": "^10.16.4"
+    }
+    ```
+
+    **Purpose**: Styling framework, UI components, animations
+    **Last Updated**: 2024-01-08
+    **Security Status**: ✅ Up to date
+  </Accordion>
+  <Accordion title="Data Management">
+    ```json
+    {
+      "@reduxjs/toolkit": "^1.9.5",
+      "react-redux": "^8.1.1",
+      "@tanstack/react-query": "^5.51.16"
+    }
+    ```
+
+    **Purpose**: State management, data fetching, caching
+    **Last Updated**: 2024-01-05
+    **Security Status**: ✅ Up to date
+  </Accordion>
+  <Accordion title="Image & Media">
+    ```json
+    {
+      "sharp": "^0.32.2",
+      "compressorjs": "^1.2.1",
+      "react-advanced-cropper": "^0.19.4"
+    }
+    ```
+
+    **Purpose**: Image optimization, compression, cropping
+    **Last Updated**: 2024-01-12
+    **Security Status**: ✅ Up to date
+  </Accordion>
+  <Accordion title="Analytics & Tracking">
+    ```json
+    {
+      "react-hot-toast": "^2.4.1",
+      "typewriter-effect": "^2.21.0",
+      "react-lottie": "^1.2.3"
+    }
+    ```
+
+    **Purpose**: User feedback, animations, tracking
+    **Last Updated**: 2024-01-12
+    **Security Status**: ✅ Up to date
+  </Accordion>
+</AccordionGroup>
+
+## 📡 API Endpoints Documentation
+
+### Landing Page Data Endpoints
+
+<AccordionGroup>
+  <Accordion title="GET /header">
+    **Endpoint**: `GET /header `\
+    **Purpose**: Fetch Dog, Fish, Cat, Bird, New Stories, and Shelter Rescue image data in the 'All Pets' dropdown in the navbar.\
+    **Loading Time**: 60-90ms (avg: 80ms)\
+    **Last Tested**: 09-03-2025
+  </Accordion>
+  <Accordion title="GET /topic-category/list">
+    **Endpoint**: `GET /topic-category/list`\
+    **Purpose**: Fetch media and resources data News, Blogs, Guids in navbar 'Media' dropdown.\
+    **Loading Time**: 50-100ms (avg: 80ms)\
+    **Last Tested**: 09-03-2025
+  </Accordion>
+  <Accordion title="GET /banner/all/type-wise">
+    **Endpoint**: `GET /banner/all/type-wise `\
+    **Purpose**: Fetch hero section banners images in slider.\
+    **Loading Time**: (avg: 0ms)\
+    **Last Tested**: 09-03-2025
+  </Accordion>
+  <Accordion title="GET /landing-data">
+    **Endpoint**: `GET /landing-data `\
+    **Purpose**: Fetch comprehensive landing page data including pet stories and news, dog/cat/fish/bird breeds, event data from other cities, pet stores in multiple cities, and all other necessary landing‑page content.\
+    **Loading Time**: (avg: 0ms)\
+    **Last Tested**: 09-03-2025
+  </Accordion>
+  <Accordion title="GET /footer?footer_content=home-page">
+    **Endpoint**: `GET /footer?footer_content=home-page `\
+    **Purpose**: Fetch homepage SEO details to be displayed in the footer.\
+    **Loading Time**: (avg: 0ms)\
+    **Last Tested**: 09-03-2025
+  </Accordion>
+</AccordionGroup>
