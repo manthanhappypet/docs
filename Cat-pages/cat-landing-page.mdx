@@ -1,0 +1,183 @@
+---
+title: "Cat Landing Page Module"
+description: "Complete documentation for the Cat Breeds landing page with components, data flow, APIs, performance, and UX."
+---
+
+# Cat Landing Page Module
+
+The Cat Landing Page helps users explore cat breeds via search, size filters, curated picks, comparisons, and blog content. It is served at `/cat-breeds` and rendered with SSR.
+
+## 🔧 Dependencies & Versions
+
+<AccordionGroup>
+  <Accordion title="React & Next.js Framework">
+    ```json
+    {
+      "react": "18.2.0",
+      "react-dom": "18.2.0",
+      "next": "13.4.12"
+    }
+    ```
+    **Purpose**: Core framework, SSR, routing  
+    **Security Status**: ✅
+  </Accordion>
+  <Accordion title="UI & Styling">
+    ```json
+    {
+      "tailwindcss": "3.3.3",
+      "@material-tailwind/react": "^2.1.10",
+      "swiper": "^10.0.4",
+      "react-icons": "^4.10.1",
+      "slick-carousel": "^1.8.1",
+      "react-slick": "^0.30.2"
+    }
+    ```
+    **Purpose**: Styling, UI components, sliders/icons  
+    **Security Status**: ✅
+  </Accordion>
+  <Accordion title="Data & State">
+    ```json
+    {
+      "@reduxjs/toolkit": "^1.9.5",
+      "react-redux": "^8.1.1",
+      "@tanstack/react-query": "^5.51.16",
+      "axios": "^1.4.0",
+      "lodash": "^4.17.21"
+    }
+    ```
+    **Purpose**: State management, fetching, utilities  
+    **Security Status**: ✅
+  </Accordion>
+  <Accordion title="Media & Utilities">
+    ```json
+    {
+      "sharp": "^0.32.2",
+      "moment": "^2.29.4"
+    }
+    ```
+    **Purpose**: Image optimization, dates  
+    **Security Status**: ✅
+  </Accordion>
+</AccordionGroup>
+
+## 📁 Location
+
+- **Page**: `src/pages/cat-breeds/index.jsx`  
+- **Store (breeds)**: `src/store/breed.js`  
+- **Shared/Static Types**: `src/utils/types` (for `popularBreeds`, `indianPremiumBreeds`, `breedComparison`, `faqs`)
+
+## 🧩 Component Overview
+
+- `Layout`, `Footer` for page chrome
+- `Breadcrumbs` for navigation trail
+- Hero section with responsive banner and `SearchBar`:
+  - Props: `petType="cat"`, `breed`, `setBreed`, `breedName`, `setBreedName`, `listFilter`, `setListFilter`, `breedListData`, `setBreedSlug`
+  - 500ms debounced search triggers list fetch
+- Curations:
+  - `BasicBreedCard` list from `popularBreeds` (static types)
+  - `IndianPremiumBreed` using `indianPremiumBreeds` (static types)
+  - `SizeDoesMatter` using counts from SSR `landingPageData`
+- Explore actions: compare breeds (grid and “Custom Comparison” link)
+- Content: `ArticlesListCard` for Cat Blogs (from SSR `landingPageData.catStories`)
+- `FAQs` with schema
+
+## 🔄 Data Flow
+
+- SSR (`getServerSideProps`) fetches:
+  - `GET footer?footer_content=cat-landing-page` → SEO metadata
+  - `GET breed/common-data?page_name=catLandingPage` → size counts, totalBreeds, catStories
+  - Injects as `landingPageData = data.catLandingData`
+- CSR (on search/filter update):
+  - Dispatches `breedList({ searchDebounce, filterBy, type: "cat", sortBy: "" })`
+  - 500ms debounce for input
+- Unmount cleanup:
+  - Dispatches `clearBreedListData()` to reset list state
+
+## 📡 API Endpoints
+
+<AccordionGroup>
+  <Accordion title="GET breed/common-data?page_name=catLandingPage">
+    - **Purpose**: Provides landing data for cats (counts by size, totalBreeds, catStories)  
+    - **Used In**: SSR to hydrate page content
+    ```http
+    GET /breed/common-data?page_name=catLandingPage
+    ```
+    - **Response (fields of interest)**:
+      - `data.catLandingData.totalBreeds`
+      - `data.catLandingData.breedCountsBySize.{totalSmallBreedsCount,totalMediumBreedsCount,totalLargeBreedsCount}`
+      - `data.catLandingData.catStories[]`
+  </Accordion>
+  <Accordion title="GET breed/list">
+    - **Purpose**: Search/filter cat breeds client-side  
+    - **Triggered By**: Debounced search or quick filters  
+    ```http
+    GET /breed/list?search={q}&limit=500&filterBy={keyOrEmpty}&pet_type=cat&sortBy=
+    ```
+    - **Notes**: Large `limit` may affect payload; consider pagination if needed
+  </Accordion>
+  <Accordion title="GET footer?footer_content=cat-landing-page">
+    - **Purpose**: SEO metadata for the cat landing page  
+    - **Used In**: SSR to set meta tags and structured data
+    ```http
+    GET /footer?footer_content=cat-landing-page
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 🌐 Environment Variables
+
+- `HAPPYPET_API_URL` (API base)  
+- `HAPPYPET_IMAGE_URL` (assets base)  
+- `HAPPYPET_WEB_URL` (canonical/OG URLs)
+
+## 🧭 UX Flow
+
+1. SSR renders hero, search, and SEO-ready head tags (Organization, BreadcrumbList, ItemList, optional FAQ schema).
+2. User can:
+   - Search and select a breed → navigates to `/cat-breeds/[slug]`.
+   - Explore “Most popular Cat Breeds in India” (static curated list).
+   - View premium breeds section.
+   - Browse by size via `SizeDoesMatter` (Small/Medium/Large).
+   - Use comparison grid or “Custom Comparison”.
+   - Read Cat Blogs (first four items).
+   - Read FAQs.
+3. Footer renders with global links and SEO content.
+
+## 📈 Performance & Behavior
+
+- **SSR requests**: 2 (footer SEO + cat landing common data)
+- **CSR requests**: Search/filter hits `breed/list` after 500ms debounce
+- **Known heavy ops**:
+  - `breed/list` with `limit=500`; rely on debounce to minimize chatter
+- **Images**:
+  - Served via `HAPPYPET_IMAGE_URL`; ensure responsive sizing and lazy loading
+- **Recommendations**:
+  - CDN/server cache for `breed/common-data` to stabilize TTFB
+  - Audit hero/banner assets for LCP on `/cat-breeds`
+
+## 🧪 SEO & Structured Data
+
+- Injected schemas:
+  - `Organization`
+  - `BreadcrumbList`
+  - `ItemList` (cat examples like Bengal, Bombay, Siamese)
+  - `FAQPage` (conditional on FAQs length)
+- Meta: title, description, keywords, OG/Twitter tags, canonical to `/cat-breeds`
+
+## 🔗 Key Routes
+
+- Landing: `/cat-breeds`
+- Breed details: `/cat-breeds/[slug]`
+- Compare: `/cat-breeds/compare?breed1={slug}&breed2={slug}`
+- All breeds list: `/cat-breeds/list`
+
+## ⚠️ Edge Cases
+
+- Empty search string resets to broad list; debounce avoids request spam.
+- If `catStories` < 4, the blogs section is hidden.
+- Size cards render only when corresponding counts > 0.
+
+## 🧱 Imported Components (primary)
+
+- `SearchBar`, `Breadcrumbs`, `BasicBreedCard`, `IndianPremiumBreed`, `SizeDoesMatter`, `ArticlesListCard`, `FAQs`, `Layout`, `Footer`
+- Static data helpers: `popularBreeds`, `indianPremiumBreeds`, `breedComparison`, `faqs` from `@/utils/types`
