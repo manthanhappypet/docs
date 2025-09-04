@@ -1,0 +1,185 @@
+---
+title: "Dog Landing Page Module"
+description: "Complete documentation for the Dog Breeds landing page with components, data flow, APIs, performance, and UX."
+---
+
+# Dog Landing Page Module
+
+The Dog Landing Page surfaces dog breed discovery, quick filters, size-based browsing, curated picks, comparisons, and relevant blog content. It is served at `/dog-breeds` and rendered with SSR.
+
+## 🔧 Dependencies & Versions
+
+<AccordionGroup>
+  <Accordion title="React & Next.js Framework">
+    ```json
+    {
+      "react": "18.2.0",
+      "react-dom": "18.2.0",
+      "next": "13.4.12"
+    }
+    ```
+    **Purpose**: Core framework, SSR, routing  
+    **Security Status**: ✅
+  </Accordion>
+  <Accordion title="UI & Styling">
+    ```json
+    {
+      "tailwindcss": "3.3.3",
+      "@material-tailwind/react": "^2.1.10",
+      "swiper": "^10.0.4",
+      "react-icons": "^4.10.1",
+      "slick-carousel": "^1.8.1",
+      "react-slick": "^0.30.2"
+    }
+    ```
+    **Purpose**: Styling, UI components, sliders/icons  
+    **Security Status**: ✅
+  </Accordion>
+  <Accordion title="Data & State">
+    ```json
+    {
+      "@reduxjs/toolkit": "^1.9.5",
+      "react-redux": "^8.1.1",
+      "@tanstack/react-query": "^5.51.16",
+      "axios": "^1.4.0",
+      "lodash": "^4.17.21"
+    }
+    ```
+    **Purpose**: State management, fetching, utilities  
+    **Security Status**: ✅
+  </Accordion>
+  <Accordion title="Media & Utilities">
+    ```json
+    {
+      "sharp": "^0.32.2",
+      "moment": "^2.29.4"
+    }
+    ```
+    **Purpose**: Image optimization, dates  
+    **Security Status**: ✅
+  </Accordion>
+</AccordionGroup>
+
+## 📁 Location
+
+- **Page**: `src/pages/dog-breeds/index.jsx`  
+- **Store (breeds)**: `src/store/breed.js`  
+- **Shared Components**: under `src/component/breed`, `src/component/common`, `src/component/news-stories`
+
+## 🧩 Component Overview
+
+- `Layout` and `Footer` for page chrome
+- `Breadcrumbs` for navigation trail
+- Hero banner with responsive images and a `SearchBar`:
+  - Props: `petType="dog"`, `breed`, `setBreed`, `breedName`, `setBreedName`, `listFilter`, `setListFilter`, `breedListData`, `setBreedSlug`
+  - Debounced search (500ms) triggers breed list fetch
+- `MostPopularChips` as quick filters (Apartment friendly, Low shedding, Family friendly, Tiny/Large/Medium)
+- Curations:
+  - `IndianPremiumBreed` (Top premium breeds)
+  - `Top4IndianBreeds` (Indian-origin breeds)
+  - `SizeDoesMatter` (Small/Medium/Large/Giant)
+  - Curated “Top breeds of the month” card grid
+- Explore actions: compare breeds, breed selector, dog name generator (links/cards)
+- Content: `ArticlesListCard` for dog blogs
+- `FAQs` with schema
+
+## 🔄 Data Flow
+
+- SSR: `getServerSideProps` fetches:
+  - `GET footer?footer_content=dog-landing-page` → SEO metadata
+  - `GET breed/common-data?page_name=dogLandingPage` → counts, curated lists, dogStories
+- CSR (on search/filter update):
+  - Dispatches `breedList({ searchDebounce, filterBy, type: "dog", sortBy: "" })`
+  - Endpoint: `GET breed/list?search=...&limit=500&filterBy=...&pet_type=dog&sortBy=...`
+  - 500ms debounce for input
+
+## 📡 API Endpoints
+
+<AccordionGroup>
+  <Accordion title="GET breed/common-data?page_name=dogLandingPage">
+    - **Purpose**: Provides landing data for dogs (counts by size, curated lists, dogStories)  
+    - **Used In**: SSR to hydrate page content
+    ```http
+    GET /breed/common-data?page_name=dogLandingPage
+    ```
+    - **Response (fields of interest)**:
+      - `data.dogLandingData.totalBreeds`
+      - `data.dogLandingData.breedCountsBySize.{totalSmallBreedsCount,totalMediumBreedsCount,totalLargeBreedsCount,totalGiantBreedsCount}`
+      - `data.dogLandingData.breedsOfTheMonth[]`
+      - `data.dogLandingData.dogStories[]`
+  </Accordion>
+  <Accordion title="GET breed/list">
+    - **Purpose**: Search/filter dog breeds client-side  
+    - **Triggered By**: Debounced search or quick filters  
+    ```http
+    GET /breed/list?search={q}&limit=500&filterBy={keyOrEmpty}&pet_type=dog&sortBy=
+    ```
+    - **Notes**: Large `limit` may affect payload; consider pagination if needed
+  </Accordion>
+  <Accordion title="GET footer?footer_content=dog-landing-page">
+    - **Purpose**: SEO metadata for the dog landing page  
+    - **Used In**: SSR to set meta tags and structured data
+    ```http
+    GET /footer?footer_content=dog-landing-page
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 🌐 Environment Variables
+
+- `HAPPYPET_API_URL` (API base)  
+- `HAPPYPET_IMAGE_URL` (assets base)  
+- `HAPPYPET_WEB_URL` (canonical/OG URLs)
+
+## 🧭 UX Flow
+
+1. Page SSR renders hero with SEO-ready head tags (Organization, BreadcrumbList, ItemList, optional FAQ schema).
+2. User can:
+   - Use the search bar to find a breed; upon selection, navigate to `/dog-breeds/[slug]`.
+   - Tap quick filters to pre-fill and refine the list.
+   - Explore curated sections: Top breeds of the month, Indian climate breeds, Premium breeds.
+   - Browse size-based sections via `SizeDoesMatter`.
+   - Jump to compare tool, name generator, or breed selector.
+   - Read featured Dog Blogs (first four items).
+   - Consult FAQs.
+3. Footer renders with global links and SEO content.
+
+## 📈 Performance & Behavior
+
+- **SSR requests**: 2 (footer SEO + dog landing common data)
+- **CSR requests**: Search/filter hits `breed/list` after 500ms debounce
+- **Known heavy ops**:
+  - `breed/list` with `limit=500`. If user typing causes frequent calls, rely on debounce; consider reducing limit or implementing pagination/“show more” for lists.
+- **Images**:
+  - Served via `HAPPYPET_IMAGE_URL`; ensure proper dimensions and lazy loading where applicable.
+- **Recommendations**:
+  - Cache SSR `breed/common-data` briefly (CDN or server cache) to reduce TTFB variation.
+  - Confirm hero/media assets are compressed and sized appropriately for mobile/desktop.
+  - Monitor LCP on `/dog-breeds` for hero/banner images.
+
+## 🧪 SEO & Structured Data
+
+- Injected schemas (from page):
+  - `Organization`
+  - `BreadcrumbList`
+  - `ItemList` (curated breed examples)
+  - `FAQPage` (conditional on FAQs length)
+- Meta: title, description, keywords, OG/Twitter tags, canonical to `/dog-breeds`
+
+## 🔗 Key Routes
+
+- Landing: `/dog-breeds`
+- Breed details: `/dog-breeds/[slug]`
+- Compare: `/dog-breeds/compare?breed1={slug}&breed2={slug}`
+- All breeds list: `/dog-breeds/list`
+- Tools: `/breed-selector-tool`, `/pet-name-generator?ty=Dog`
+
+## ⚠️ Edge Cases
+
+- Empty search string resets to broad list; debounce ensures minimal request spam.
+- If curated counts are zero for a size, that card is hidden.
+- If `dogStories` < 4, the blogs section is hidden.
+
+## 🧱 Imported Components (primary)
+
+- `SearchBar`, `Breadcrumbs`, `MostPopularChips`, `IndianPremiumBreed`, `Top4IndianBreeds`, `SizeDoesMatter`, `ArticlesListCard`, `FAQs`, `Layout`, `Footer`
